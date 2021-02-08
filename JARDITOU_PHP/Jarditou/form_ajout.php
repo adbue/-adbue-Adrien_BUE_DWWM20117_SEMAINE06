@@ -18,7 +18,12 @@ if (isset($_SESSION['prenom']) && $_SESSION["role"] != "admin") {
         $db = connexionBase();
 
         $request = "SELECT * FROM categories ORDER BY cat_id ASC";
-        $result = $db->query($request);
+        $request_pro = "SELECT pro_id FROM produits ORDER BY pro_id DESC";
+
+        $result_cat = $db->query($request);
+        $result_pro = $db->query($request_pro);
+
+        $produit =$result_pro->fetch(PDO::FETCH_OBJ);
 
         if (isset($_GET['error'])) 
         {
@@ -38,7 +43,7 @@ if (isset($_SESSION['prenom']) && $_SESSION["role"] != "admin") {
                 <!-- 01: Photo -->
                 <div class="form-group my-2">
                     <label for="formFile" class="form-label">Insérez la photo de votre choix (MAX : 1Mo)</label>
-                    <input class="form-control" type="file" id="formFile">
+                    <input class="form-control" type="file" name= "image" id="formFile">
                     <!-- Pour fixer une taille limite dans le formulaire, il faut ajouter un champ caché avant le champ de type file: (ICI 1 Mo)  -->
                     <input type="hidden" name="MAX_FILE_SIZE" value="1000000">
                 </div>
@@ -49,7 +54,7 @@ if (isset($_SESSION['prenom']) && $_SESSION["role"] != "admin") {
                 -->
                 <div class="form-group ">
                     <label for="id">ID :</label>
-                    <input type="text" class="form-control"  name="id" id="id" required>
+                    <input type="text" class="form-control" name="id" id="id" value="<?php echo ($produit->pro_id)+1;?>" >
                 </div>
                 
                 <!-- 02 = Référence produit : -->
@@ -65,7 +70,7 @@ if (isset($_SESSION['prenom']) && $_SESSION["role"] != "admin") {
                     <select id="categorie" class="form-control" name="cat" required>
                         <option selected disabled value="selection">Veuillez sélectionner une catégorie pour votre article</option>    
                         <?php 
-                            while($cat = $result->fetch(PDO::FETCH_OBJ))
+                            while($cat = $result_cat->fetch(PDO::FETCH_OBJ))
                             {
                                 echo '<option value="'.$cat->cat_id.'">'.$cat->cat_id.' - '.$cat->cat_nom.'</option>';
                             }
@@ -105,7 +110,7 @@ if (isset($_SESSION['prenom']) && $_SESSION["role"] != "admin") {
                 <!-- 08 = Couleur: -->
                 <div class="form-group">
                     <label for="couleur">Couleur :</label>
-                    <input type="text" class="form-control" name="couleur" id="couleur" required>
+                    <input type="text" class="form-control" name="color" id="couleur" required>
                 </div>
 
 
@@ -113,11 +118,11 @@ if (isset($_SESSION['prenom']) && $_SESSION["role"] != "admin") {
                 <div class="form-group">
                     <p>Produit bloqué ? :</p>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="bloque" id="bloque" value="Oui" required>
+                        <input class="form-check-input" type="radio" name="bloque" id="bloque" value="1" required>
                         <label class="form-check-label" for="bloque">Oui</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="bloque" id="bloque" value="Non" required>
+                        <input class="form-check-input" type="radio" name="bloque" id="bloque" value="0" required>
                         <label class="form-check-label" for="bloque">Non</label>
                     </div>
                 </div>

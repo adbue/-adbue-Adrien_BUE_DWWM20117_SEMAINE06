@@ -10,15 +10,20 @@ if(isset($_POST["submit"]))
 
     // Sanitize input
 
-    $id           = sanitizing($_POST["id"]);
-    $ref          = sanitizing($_POST["ref"]);
-    $cat          = sanitizing($_POST["cat"]);
-    $lib          = sanitizing($_POST["lib"]);
-    $desc         = sanitizing($_POST["desc"]);
-    $prix         = sanitizing($_POST["prix"]);
-    $stock        = sanitizing($_POST["stock"]);
-    $color        = sanitizing($_POST["color"]);
-    $bloque       = sanitizing($_POST["bloque"]);
+    $id    = sanitizing($_POST["id"]);
+    $ref   = sanitizing($_POST["ref"]);
+    $cat   = sanitizing($_POST["cat"]);
+    $lib   = sanitizing($_POST["lib"]);
+    $desc  = sanitizing($_POST["desc"]);
+    $prix  = sanitizing($_POST["prix"]);
+    $stock = sanitizing($_POST["stock"]);
+    $color = sanitizing($_POST["color"]);
+    if($_POST['bloque'] == "0") {
+        $bloque = NULL;
+    }else{
+        $bloque = 1;
+    }
+    
     $date_d_ajout = date('Y-m-d');
 
 
@@ -43,56 +48,37 @@ if(isset($_POST["submit"]))
     &&  !empty($_POST["color"]) && preg_match($pattern_color ,$color)
     &&  isset($_POST["bloque"]))
     {
-        try
+       try
         {
-            // On met les types autorisés dans un tableau (ici pour une image)
-            $aMimeTypes = array("image/gif", "image/jpeg", "image/pjpeg", "image/png", "image/x-png", "image/tiff");
-
-            // On ouvre l'extension FILE_INFO
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-
-            // On extrait le type MIME du fichier via l'extension FILE_INFO 
-            $mimetype = finfo_file($finfo, $_FILES["fichier"]["tmp_name"]);
-
-            // On ferme l'utilisation de FILE_INFO 
-            finfo_close($finfo);
-
-            if (in_array($mimetype, $aMimeTypes))
-            {
-                $extension = substr(strrchr($_FILES["fichier"]["name"], "."), 1);
-                $location = "00_rsrc/src/img/$id.$extension";
-                move_uploaded_file($_FILES['photo']['tmp_name'], $location);
-            } 
-            else 
-            {
-               // Le type n'est pas autorisé, donc ERREUR
-                echo "Type de fichier non autorisé";    
-                exit;
-            }    
             require("connexion_bdd.php");
 
 
             $db = ConnexionBase();
 
-            $request = $db->prepare("INSERT INTO produits (pro_id,pro_cat_id,pro_ref,pro_libelle,pro_description,pro_prix,pro_stock,pro_couleur,pro_d_ajout,pro_bloque)
-                                    VALUES (:pro_id,:pro_cat_id,:pro_ref,:pro_libelle,:pro_description,:pro_prix,:pro_stock,:pro_couleur,:pro_d_ajout,:pro_bloque)");
+            if($_FILES['image']['size'] <= 1000000)
+            {
+                $infoImage = pathinfo($_FILES["image"]["name"]);
+                $name = $id;
+                $extensionImage = substr(strrchr($_FILES["image"]["name"], "."), 1);;
+    
+                $tabExtensionValid = array ("jpg", "png", "jpeg", "gif");
+    
+                if (in_array($extensionImage, $tabExtensionValid)) 
+                {
+                    $location =$_SERVER["DOCUMENT_ROOT"]."/PROJET/Jarditou/00_rsrc/src/img/".$name.".".$extensionImage;
+                    move_uploaded_file($_FILES["image"]["tmp_name"],$location);
+                }
+            }
 
-            $request->bindValue(":pro_id",$id);
-            $request->bindValue(":pro_cat_id",$cat);
-            $request->bindValue(":pro_ref",$ref);
-            $request->bindValue(":pro_libelle",$lib);
-            $request->bindValue(":pro_decription",$desc);
-            $request->bindValue(":pro_prix",$prix);
-            $request->bindValue(":pro_stock",$stock);
-            $request->bindValue(":pro_couleur",$color);
-            $request->bindValue(":pro_d_ajout",$date_d_ajout);
-            $request->bindValue(":pro_bloque",$bloque);
+            $request = $db->prepare("INSERT INTO produits (pro_id,pro_cat_id,pro_ref,pro_libelle,pro_description,pro_prix,pro_stock,pro_couleur,pro_d_ajout,pro_bloque,pro_photo)
+                                    VALUES ('$id','$cat','$ref','$lib','$desc','$prix','$stock','$color','$date_d_ajout','$bloque','$extensionImage')");
+
 
             $request->execute();
 
             $request->closeCursor();
 
-            header("Location: list.php/msg=add");
+            header("Location: list.php?msg=add");
             exit();
 
         } catch (Exception $e) 
@@ -102,8 +88,8 @@ if(isset($_POST["submit"]))
             echo "Erreur : " . $e->getMessage() . "<br>";
             echo "N° : " . $e->getCode();
             die("Fin du script");
-        }
+        } 
     } else {
-        header("Location: form_ajout.php/error");
+        header("Location: form_ajout.php?error");
     }
 }
