@@ -1,5 +1,4 @@
 <?php
-    $webPage = "3";
     require("01_inc/header.inc.php");
 ?>
 <!-- 

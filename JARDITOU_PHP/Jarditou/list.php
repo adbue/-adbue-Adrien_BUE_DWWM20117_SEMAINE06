@@ -1,6 +1,6 @@
 <?php
 session_start();
-$webPage = 2;
+
 require '01_inc/header.inc.php';
 ?>
 <div class="row">

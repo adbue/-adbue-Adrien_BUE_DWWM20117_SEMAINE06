@@ -1,13 +1,13 @@
 <?php
 session_start();
-$webPage = "1";
+
 require("01_inc/header.inc.php");
 ?>
 <?php
 if (isset($_SESSION['prenom'])) 
 {
     echo "<div class =\" alert alert-success\" role=\"alert\">";
-        echo "Bonjour ".$_SESSION["prenom"]." ".$_SESSION["nom"]." et bienvenue sur le site de Jaridtou. <a href= 'deconnexion_script.php'>CLIQUEZ ICI</a>";
+        echo "Bonjour ".$_SESSION["prenom"]." ".$_SESSION["nom"]." et bienvenue sur le site de Jaridtou. <a href= 'deconnexion_script.php'>Deconnexion</a>";
     echo "</div>";
 }
 if (isset($_GET['disco'])) 

@@ -55,6 +55,13 @@
                     <a class="dropdown-item text-center" href="login.php">Connexion</a>
                 </div>
             </li>
+            <?php
+            if(isset($_SESSION["prenom"])){
+            echo '<li>';
+                echo '<a class="nav-link" href="deconnexion_script.php">Deconnexion</a>';
+            echo '</li>';
+            }
+            ?>
             <li>
                 <a class="nav-link" href="contact.php" title="Aller à la page Contact">Contact</a>
             </li>
